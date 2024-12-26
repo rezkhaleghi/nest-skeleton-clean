@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import { TodoStatus } from '../enums/todo.enum';
+import { User } from './user.entity';
 
 @Schema({ timestamps: true })
 export class Todo extends Document {
@@ -12,6 +13,9 @@ export class Todo extends Document {
 
   @Prop({ type: String, enum: TodoStatus, default: TodoStatus.IN_PROGRESS })
   status: TodoStatus;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+  user: User;
 }
 
 export const TodoSchema = SchemaFactory.createForClass(Todo);

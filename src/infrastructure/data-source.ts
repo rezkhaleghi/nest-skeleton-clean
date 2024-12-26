@@ -2,16 +2,24 @@
 import { MongooseModule } from '@nestjs/mongoose';
 import { config } from 'dotenv';
 config();
+import * as mongoose from 'mongoose';
 
 // Mongoose configuration
-export const MongooseConfig = MongooseModule.forRootAsync({
+export const AppDataSource = MongooseModule.forRootAsync({
   useFactory: () => ({
     uri: `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    user: process.env.DB_USER,
-    pass: process.env.DB_PASS,
+    // user: process.env.DB_USER,
+    // pass: process.env.DB_PASS,
   }),
+});
+
+// Log a message when connected to the database
+mongoose.connection.on('connected', () => {
+  console.log('Connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error(`Error connecting to MongoDB: ${err.message}`);
 });
 
 // you can use this code for TypeORM configuration (mysql, postgres, mssql etc)

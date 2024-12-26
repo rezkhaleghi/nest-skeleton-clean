@@ -1,3 +1,4 @@
+// src/api/services/todo.service.ts
 import {
   Injectable,
   NotFoundException,
@@ -46,6 +47,8 @@ export class TodoService {
 
   async update(id: string, updateTodoDto: UpdateTodoDto): Promise<Todo> {
     try {
+      console.log('updateTodoDto', updateTodoDto);
+
       const todo = await this.todoModel
         .findByIdAndUpdate(id, updateTodoDto, { new: true })
         .exec();

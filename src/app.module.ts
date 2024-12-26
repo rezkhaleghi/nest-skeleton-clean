@@ -1,16 +1,16 @@
 // src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './api/modules/todo.module';
 import { AuthModule } from './api/modules/auth.module';
+import { AppDataSource } from './infrastructure/data-source';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    AppDataSource,
     TodoModule,
     AuthModule,
   ],
