@@ -1,38 +1,18 @@
+// src/app.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
-// import { AppDataSource } from './infrastructure/data-source';
+import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './api/modules/todo.module';
+import { AuthModule } from './api/modules/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60m' },
-    }),
-
-    TypeOrmModule.forRoot({
-      type: 'mssql',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-      options: {
-        encrypt: false,
-        trustServerCertificate: true, // Accept self-signed certificates
-      },
-    }),
-    //apply below line in production and set Database in data-source file
-    // TypeOrmModule.forRoot(AppDataSource.options),
-
+    MongooseModule.forRoot(process.env.MONGO_URI),
     TodoModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -3,67 +3,70 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Todo } from '../../domain/entities/todo.entity';
 import { CreateTodoDto, UpdateTodoDto } from '../DTOs/todo.dto';
 
 @Injectable()
 export class TodoService {
   constructor(
-    @InjectRepository(Todo)
-    private readonly todoRepository: Repository<Todo>,
+    @InjectModel(Todo.name) private readonly todoModel: Model<Todo>,
   ) {}
 
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
     try {
-      const todo = this.todoRepository.create(createTodoDto);
-      return await this.todoRepository.save(todo);
+      const todo = new this.todoModel(createTodoDto);
+      return await todo.save();
     } catch (error) {
-      throw new InternalServerErrorException('Error creating todo');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
-  async findAll(userId: number): Promise<Todo[]> {
+  async find(page: number = 1, limit: number = 10): Promise<Todo[]> {
     try {
-      return await this.todoRepository.find({ where: { userId } });
+      const skip = (page - 1) * limit;
+      return await this.todoModel.find().skip(skip).limit(limit).exec();
     } catch (error) {
-      throw new InternalServerErrorException('Error fetching todos');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
-  async findOne(id: number): Promise<Todo> {
+  async findOne(id: string): Promise<Todo> {
     try {
-      const todo = await this.todoRepository.findOne({ where: { id } });
+      const todo = await this.todoModel.findById(id).exec();
       if (!todo) {
         throw new NotFoundException(`Todo with id ${id} not found`);
       }
       return todo;
     } catch (error) {
-      throw new InternalServerErrorException('Error fetching todo');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
-  async update(id: number, updateTodoDto: UpdateTodoDto): Promise<Todo> {
+  async update(id: string, updateTodoDto: UpdateTodoDto): Promise<Todo> {
     try {
-      const result = await this.todoRepository.update(id, updateTodoDto);
-      if (result.affected === 0) {
+      const todo = await this.todoModel
+        .findByIdAndUpdate(id, updateTodoDto, { new: true })
+        .exec();
+
+      if (!todo) {
         throw new NotFoundException(`Todo with id ${id} not found`);
       }
-      return await this.findOne(id);
+      return todo;
     } catch (error) {
-      throw new InternalServerErrorException('Error updating todo');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     try {
-      const result = await this.todoRepository.delete(id);
-      if (result.affected === 0) {
+      const result = await this.todoModel.findByIdAndDelete(id).exec();
+      if (!result) {
         throw new NotFoundException(`Todo with id ${id} not found`);
       }
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting todo');
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

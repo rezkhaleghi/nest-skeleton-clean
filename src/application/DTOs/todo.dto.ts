@@ -8,11 +8,8 @@ export class CreateTodoDto {
   @ApiProperty({ example: 'Milk, eggs, and bread' })
   description?: string;
 
-  @ApiProperty({ enum: TodoStatus, default: TodoStatus.PENDING })
+  @ApiProperty({ enum: TodoStatus, default: TodoStatus.IN_PROGRESS })
   status?: TodoStatus;
-
-  @ApiProperty({ example: 123 })
-  userId: number;
 }
 
 export class UpdateTodoDto {
@@ -22,9 +19,6 @@ export class UpdateTodoDto {
   @ApiPropertyOptional({ example: 'Milk, eggs, and bread' })
   description?: string;
 
-  @ApiPropertyOptional({ enum: TodoStatus, default: TodoStatus.PENDING })
+  @ApiPropertyOptional({ enum: TodoStatus, default: TodoStatus.IN_PROGRESS })
   status?: TodoStatus;
-
-  @ApiPropertyOptional({ example: 123 })
-  userId?: number; // Updated field type
 }

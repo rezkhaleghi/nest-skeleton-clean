@@ -1,8 +1,21 @@
 // src/data-source.ts
-import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { config } from 'dotenv';
 config();
+
+// Mongoose configuration
+export const MongooseConfig = MongooseModule.forRootAsync({
+  useFactory: () => ({
+    uri: `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    user: process.env.DB_USER,
+    pass: process.env.DB_PASS,
+  }),
+});
+
+// you can use this code for TypeORM configuration (mysql, postgres, mssql etc)
+// src/data-source.ts import AppDataSource in app.module.ts
 
 // export const AppDataSource = new DataSource({
 //   type: 'mysql',
